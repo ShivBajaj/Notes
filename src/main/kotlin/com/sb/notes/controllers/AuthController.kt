@@ -1,7 +1,6 @@
 package com.sb.notes.controllers
 
 import com.sb.notes.security.AuthService
-import com.sb.notes.security.JwtService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/auth")
 class AuthController (
-    val authService: AuthService
+    private val authService: AuthService
 ){
     data class AuthRequest(
         val email: String,

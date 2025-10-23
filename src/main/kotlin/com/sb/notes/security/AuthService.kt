@@ -28,6 +28,13 @@ class AuthService(
     )
 
     fun register(email: String, password: String): User {
+
+        println("Mongo connected? " + usersRepository.count())
+
+        val existing = usersRepository.findByEmail(email)
+        if (existing != null) {
+            throw IllegalArgumentException("Email already in use")
+        }
         return usersRepository.save(
             User(
                 email = email,
@@ -37,7 +44,8 @@ class AuthService(
     }
 
     fun login(email: String, password: String): TokenPair {
-        val user = usersRepository.findByEmail(email)?: throw BadCredentialsException("Invalid credentials")
+        val user = usersRepository.findByEmail(email)
+            ?: throw BadCredentialsException("Invalid credentials")
         if(!hashEncoder.matches(password, user.hashedPassword)){
             throw BadCredentialsException("Invalid credentials")
         }
@@ -59,7 +67,7 @@ class AuthService(
             throw BadCredentialsException("Invalid refresh token")
         }
 
-        val userId = jwtService.getUserIdFromJWT(refreshToken)
+        val userId = jwtService.getUserIdFromToken(refreshToken)
         val user = usersRepository.findById(ObjectId(userId)).orElseThrow { BadCredentialsException("Invalid refresh token") }
 
         val hashed = hashToken(refreshToken)
